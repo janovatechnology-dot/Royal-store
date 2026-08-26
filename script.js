@@ -1,112 +1,140 @@
-/* =========================================
+/* =====================================================
    ROYAL STORE BILLING SYSTEM
-   ========================================= */
+   FIREBASE FIRESTORE VERSION
+   ===================================================== */
+
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    doc,
+    updateDoc,
+    query,
+    orderBy
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
-/* STORAGE */
+/* =====================================================
+   FIREBASE CONFIG
+   ===================================================== */
 
-const PRODUCT_STORAGE =
-    "royal_store_products";
+const firebaseConfig = {
 
-const BILL_STORAGE =
-    "royal_store_bills";
+    apiKey: "AIzaSyBw4j-zNjSPi898H7U-z2LpD7W3hvJo6uM",
 
+    authDomain:
+        "royal-store-74fb3.firebaseapp.com",
 
-/* PRODUCTS */
+    projectId:
+        "royal-store-74fb3",
 
-let products =
-    JSON.parse(
-        localStorage.getItem(PRODUCT_STORAGE)
-    ) || [
+    storageBucket:
+        "royal-store-74fb3.firebasestorage.app",
 
-        {
-            id: 1,
-            name: "Bath Soap",
-            category: "Personal Care",
-            price: 40,
-            stock: 10,
-            original: 10,
-            alert: 2
-        },
+    messagingSenderId:
+        "137094292552",
 
-        {
-            id: 2,
-            name: "Potato Chips",
-            category: "Snacks",
-            price: 30,
-            stock: 25,
-            original: 25,
-            alert: 5
-        },
+    appId:
+        "1:137094292552:web:6bdca07bc91f88d3c2647d"
 
-        {
-            id: 3,
-            name: "Vanilla Ice Cream",
-            category: "Ice Cream",
-            price: 80,
-            stock: 8,
-            original: 8,
-            alert: 2
-        },
-
-        {
-            id: 4,
-            name: "Rice 5 KG",
-            category: "Grocery",
-            price: 320,
-            stock: 15,
-            original: 15,
-            alert: 3
-        },
-
-        {
-            id: 5,
-            name: "Shampoo",
-            category: "Personal Care",
-            price: 120,
-            stock: 12,
-            original: 12,
-            alert: 3
-        }
-
-    ];
+};
 
 
-/* BILLS */
+/* =====================================================
+   INITIALIZE FIREBASE
+   ===================================================== */
 
-let bills =
-    JSON.parse(
-        localStorage.getItem(BILL_STORAGE)
-    ) || [];
+const app =
+    initializeApp(firebaseConfig);
+
+const db =
+    getFirestore(app);
 
 
-/* CART */
+/* =====================================================
+   FIRESTORE COLLECTIONS
+   ===================================================== */
+
+const productsRef =
+    collection(db, "products");
+
+const billsRef =
+    collection(db, "bills");
+
+
+/* =====================================================
+   DATA
+   ===================================================== */
+
+let products = [];
+
+let bills = [];
 
 let cart = [];
 
 
-/* =========================================
-   SAVE DATA
-   ========================================= */
+/* =====================================================
+   DEFAULT PRODUCTS
+   ===================================================== */
 
-function saveData() {
+const defaultProducts = [
 
-    localStorage.setItem(
-        PRODUCT_STORAGE,
-        JSON.stringify(products)
-    );
+    {
+        name: "Bath Soap",
+        category: "Personal Care",
+        price: 40,
+        stock: 10,
+        original: 10,
+        alert: 2
+    },
 
-    localStorage.setItem(
-        BILL_STORAGE,
-        JSON.stringify(bills)
-    );
+    {
+        name: "Potato Chips",
+        category: "Snacks",
+        price: 30,
+        stock: 25,
+        original: 25,
+        alert: 5
+    },
 
-}
+    {
+        name: "Vanilla Ice Cream",
+        category: "Ice Cream",
+        price: 80,
+        stock: 8,
+        original: 8,
+        alert: 2
+    },
+
+    {
+        name: "Rice 5 KG",
+        category: "Grocery",
+        price: 320,
+        stock: 15,
+        original: 15,
+        alert: 3
+    },
+
+    {
+        name: "Shampoo",
+        category: "Personal Care",
+        price: 120,
+        stock: 12,
+        original: 12,
+        alert: 3
+    }
+
+];
 
 
-/* =========================================
+/* =====================================================
    MONEY
-   ========================================= */
+   ===================================================== */
 
 function money(value) {
 
@@ -116,18 +144,177 @@ function money(value) {
 }
 
 
-/* =========================================
-   PAGE SWITCH
-   ========================================= */
+/* =====================================================
+   LOAD PRODUCTS FROM FIREBASE
+   ===================================================== */
 
-function openPage(page, button = null) {
+async function loadProducts() {
+
+    try {
+
+        const snapshot =
+            await getDocs(productsRef);
+
+        products = [];
+
+        snapshot.forEach(item => {
+
+            products.push({
+
+                id: item.id,
+
+                ...item.data()
+
+            });
+
+        });
+
+
+        /*
+         FIRST TIME ONLY:
+         If Firebase is empty,
+         add default products.
+        */
+
+        if (products.length === 0) {
+
+            console.log(
+                "No products found. Adding default products..."
+            );
+
+
+            for (
+                const product
+                of defaultProducts
+            ) {
+
+                const docRef =
+                    await addDoc(
+                        productsRef,
+                        product
+                    );
+
+
+                products.push({
+
+                    id: docRef.id,
+
+                    ...product
+
+                });
+
+            }
+
+        }
+
+
+        updateQuickInfo();
+
+        renderProducts();
+
+        renderStock();
+
+        renderCart();
+
+        renderSearch();
+
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Firebase products error:",
+            error
+        );
+
+        alert(
+            "Unable to load products from Firebase."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   LOAD BILLS FROM FIREBASE
+   ===================================================== */
+
+async function loadBills() {
+
+    try {
+
+        const snapshot =
+            await getDocs(billsRef);
+
+        bills = [];
+
+        snapshot.forEach(item => {
+
+            bills.push({
+
+                id: item.id,
+
+                ...item.data()
+
+            });
+
+        });
+
+
+        renderBills();
+
+        generateNextBillNumber();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Firebase bills error:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   SAVE BILL TO FIREBASE
+   ===================================================== */
+
+async function saveBillToFirebase(bill) {
+
+    const docRef =
+        await addDoc(
+            billsRef,
+            bill
+        );
+
+    return docRef.id;
+
+}
+
+
+/* =====================================================
+   PAGE SWITCH
+   ===================================================== */
+
+function openPage(
+    page,
+    button = null
+) {
 
 
     document
         .querySelectorAll(".page")
         .forEach(item => {
 
-            item.classList.add("hidden");
+            item.classList.add(
+                "hidden"
+            );
 
         });
 
@@ -135,12 +322,17 @@ function openPage(page, button = null) {
     if (page === "billing") {
 
         document
-            .getElementById("billingPage")
-            .classList.remove("hidden");
+            .getElementById(
+                "billingPage"
+            )
+            .classList.remove(
+                "hidden"
+            );
 
         document.getElementById(
             "pageTitle"
-        ).textContent = "New Bill";
+        ).textContent =
+            "New Bill";
 
     }
 
@@ -148,12 +340,16 @@ function openPage(page, button = null) {
     if (page === "products") {
 
         document
-            .getElementById("productsPage")
-            .classList.remove("hidden");
+            .getElementById(
+                "productsPage"
+            ).classList.remove(
+                "hidden"
+            );
 
         document.getElementById(
             "pageTitle"
-        ).textContent = "Products";
+        ).textContent =
+            "Products";
 
         renderProducts();
 
@@ -163,12 +359,16 @@ function openPage(page, button = null) {
     if (page === "stock") {
 
         document
-            .getElementById("stockPage")
-            .classList.remove("hidden");
+            .getElementById(
+                "stockPage"
+            ).classList.remove(
+                "hidden"
+            );
 
         document.getElementById(
             "pageTitle"
-        ).textContent = "Stock";
+        ).textContent =
+            "Stock";
 
         renderStock();
 
@@ -178,12 +378,16 @@ function openPage(page, button = null) {
     if (page === "bills") {
 
         document
-            .getElementById("billsPage")
-            .classList.remove("hidden");
+            .getElementById(
+                "billsPage"
+            ).classList.remove(
+                "hidden"
+            );
 
         document.getElementById(
             "pageTitle"
-        ).textContent = "Bill List";
+        ).textContent =
+            "Bill List";
 
         renderBills();
 
@@ -194,110 +398,134 @@ function openPage(page, button = null) {
         .querySelectorAll(".menu-btn")
         .forEach(btn => {
 
-            btn.classList.remove("active");
+            btn.classList.remove(
+                "active"
+            );
 
         });
 
 
     if (button) {
 
-        button.classList.add("active");
+        button.classList.add(
+            "active"
+        );
 
     }
 
 }
 
 
-
-/* =========================================
+/* =====================================================
    BILL NUMBER
-   ========================================= */
+   ===================================================== */
 
 function generateBillNumber() {
 
     return "BILL-" +
         String(
             bills.length + 1
-        ).padStart(4, "0");
+        ).padStart(
+            4,
+            "0"
+        );
 
 }
 
 
-document.getElementById(
-    "billNumber"
-).textContent =
-    generateBillNumber();
+function generateNextBillNumber() {
+
+    const element =
+        document.getElementById(
+            "billNumber"
+        );
+
+    if (element) {
+
+        element.textContent =
+            generateBillNumber();
+
+    }
+
+}
 
 
-
-/* =========================================
+/* =====================================================
    PRODUCT SEARCH
-   ========================================= */
+   ===================================================== */
 
-document
-    .getElementById("productSearch")
-    .addEventListener(
-        "input",
-        function () {
-
-            const value =
-                this.value
-                    .trim()
-                    .toLowerCase();
+const productSearch =
+    document.getElementById(
+        "productSearch"
+    );
 
 
-            const results =
-                document.getElementById(
-                    "searchResults"
-                );
+productSearch.addEventListener(
+    "input",
+    function () {
+
+        const value =
+            this.value
+                .trim()
+                .toLowerCase();
 
 
-            if (!value) {
-
-                results.innerHTML = "";
-
-                return;
-
-            }
+        const results =
+            document.getElementById(
+                "searchResults"
+            );
 
 
-            const found =
-                products.filter(product =>
+        if (!value) {
+
+            results.innerHTML = "";
+
+            return;
+
+        }
+
+
+        const found =
+            products.filter(
+                product =>
 
                     (
                         product.name +
                         " " +
                         product.category
                     )
-                        .toLowerCase()
-                        .includes(value)
+                    .toLowerCase()
+                    .includes(value)
 
                     &&
+
                     product.stock > 0
-
-                );
-
-
-            if (found.length === 0) {
-
-                results.innerHTML = `
-
-                    <div class="search-item">
-
-                        Product not found
-
-                    </div>
-
-                `;
-
-                return;
-
-            }
+            );
 
 
-            results.innerHTML =
+        if (
+            found.length === 0
+        ) {
 
-                found.map(product => {
+            results.innerHTML = `
+
+                <div class="search-item">
+
+                    Product not found
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        results.innerHTML =
+
+            found.map(
+                product => {
 
                     return `
 
@@ -305,9 +533,10 @@ document
                             class="search-item"
                             onclick="
                                 addToCart(
-                                    ${product.id}
+                                    '${product.id}'
                                 )
-                            ">
+                            "
+                        >
 
                             <span>
 
@@ -322,25 +551,27 @@ document
                             </span>
 
                             <b>
+
                                 ${money(
                                     product.price
                                 )}
+
                             </b>
 
                         </div>
 
                     `;
 
-                }).join("");
+                }
+            ).join("");
 
-        }
-    );
+    }
+);
 
 
-
-/* =========================================
-   ADD CART
-   ========================================= */
+/* =====================================================
+   ADD TO CART
+   ===================================================== */
 
 function addToCart(id) {
 
@@ -350,7 +581,11 @@ function addToCart(id) {
         );
 
 
-    if (!product) return;
+    if (!product) {
+
+        return;
+
+    }
 
 
     const existing =
@@ -384,23 +619,24 @@ function addToCart(id) {
 
         cart.push({
 
-            id: product.id,
+            id:
+                product.id,
 
-            name: product.name,
+            name:
+                product.name,
 
-            price: product.price,
+            price:
+                product.price,
 
-            quantity: 1
+            quantity:
+                1
 
         });
 
     }
 
 
-    document.getElementById(
-        "productSearch"
-    ).value = "";
-
+    productSearch.value = "";
 
     document.getElementById(
         "searchResults"
@@ -412,10 +648,9 @@ function addToCart(id) {
 }
 
 
-
-/* =========================================
+/* =====================================================
    RENDER CART
-   ========================================= */
+   ===================================================== */
 
 function renderCart() {
 
@@ -425,7 +660,9 @@ function renderCart() {
         );
 
 
-    if (cart.length === 0) {
+    if (
+        cart.length === 0
+    ) {
 
         body.innerHTML = `
 
@@ -433,7 +670,8 @@ function renderCart() {
 
                 <td
                     colspan="5"
-                    class="empty">
+                    class="empty"
+                >
 
                     Search a product
                     to add it to the bill
@@ -450,80 +688,98 @@ function renderCart() {
 
         body.innerHTML =
 
-            cart.map(item => {
+            cart.map(
+                item => {
 
-                const product =
-                    products.find(
-                        p => p.id === item.id
-                    );
-
-
-                return `
-
-                    <tr>
-
-                        <td>
-                            <b>
-                                ${item.name}
-                            </b>
-                        </td>
+                    const product =
+                        products.find(
+                            p =>
+                                p.id ===
+                                item.id
+                        );
 
 
-                        <td>
-                            ${money(item.price)}
-                        </td>
+                    if (!product) {
+
+                        return "";
+
+                    }
 
 
-                        <td>
+                    return `
 
-                            <input
-                                class="qty"
-                                type="number"
-                                min="1"
-                                max="${product.stock}"
-                                value="${item.quantity}"
-                                onchange="
-                                    updateQuantity(
-                                        ${item.id},
-                                        this.value
-                                    )
-                                "
-                            >
+                        <tr>
 
-                        </td>
+                            <td>
+
+                                <b>
+                                    ${item.name}
+                                </b>
+
+                            </td>
 
 
-                        <td>
+                            <td>
 
-                            ${money(
-                                item.price *
-                                item.quantity
-                            )}
+                                ${money(
+                                    item.price
+                                )}
 
-                        </td>
+                            </td>
 
 
-                        <td>
+                            <td>
 
-                            <button
-                                class="remove"
-                                onclick="
-                                    removeCart(
-                                        ${item.id}
-                                    )
-                                ">
+                                <input
+                                    class="qty"
+                                    type="number"
+                                    min="1"
+                                    max="${product.stock}"
+                                    value="${item.quantity}"
+                                    onchange="
+                                        updateQuantity(
+                                            '${item.id}',
+                                            this.value
+                                        )
+                                    "
+                                >
 
-                                ×
+                            </td>
 
-                            </button>
 
-                        </td>
+                            <td>
 
-                    </tr>
+                                ${money(
+                                    item.price *
+                                    item.quantity
+                                )}
 
-                `;
+                            </td>
 
-            }).join("");
+
+                            <td>
+
+                                <button
+                                    class="remove"
+                                    onclick="
+                                        removeCart(
+                                            '${item.id}'
+                                        )
+                                    "
+                                >
+
+                                    ×
+
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                }
+            ).join("");
 
     }
 
@@ -533,10 +789,9 @@ function renderCart() {
 }
 
 
-
-/* =========================================
+/* =====================================================
    UPDATE QUANTITY
-   ========================================= */
+   ===================================================== */
 
 function updateQuantity(
     id,
@@ -555,11 +810,20 @@ function updateQuantity(
         );
 
 
+    if (!item || !product) {
+
+        return;
+
+    }
+
+
     quantity =
         Number(quantity);
 
 
-    if (quantity < 1) {
+    if (
+        quantity < 1
+    ) {
 
         quantity = 1;
 
@@ -586,16 +850,16 @@ function updateQuantity(
 }
 
 
-
-/* =========================================
+/* =====================================================
    REMOVE CART
-   ========================================= */
+   ===================================================== */
 
 function removeCart(id) {
 
     cart =
         cart.filter(
-            item => item.id !== id
+            item =>
+                item.id !== id
         );
 
 
@@ -604,10 +868,9 @@ function removeCart(id) {
 }
 
 
-
-/* =========================================
+/* =====================================================
    BILL SUMMARY
-   ========================================= */
+   ===================================================== */
 
 function updateBillSummary() {
 
@@ -616,20 +879,24 @@ function updateBillSummary() {
     let total = 0;
 
 
-    cart.forEach(item => {
+    cart.forEach(
+        item => {
 
-        items += item.quantity;
+            items +=
+                item.quantity;
 
-        total +=
-            item.price *
-            item.quantity;
+            total +=
+                item.price *
+                item.quantity;
 
-    });
+        }
+    );
 
 
     document.getElementById(
         "totalItems"
-    ).textContent = items;
+    ).textContent =
+        items;
 
 
     document.getElementById(
@@ -646,15 +913,15 @@ function updateBillSummary() {
 }
 
 
-
-/* =========================================
+/* =====================================================
    COMPLETE BILL
-   ========================================= */
+   ===================================================== */
 
-function completeBill() {
+async function completeBill() {
 
-
-    if (cart.length === 0) {
+    if (
+        cart.length === 0
+    ) {
 
         alert(
             "Please add products first."
@@ -665,131 +932,221 @@ function completeBill() {
     }
 
 
-    /* CHECK STOCK */
+    try {
 
-    for (const item of cart) {
+        /*
+         CHECK STOCK
+        */
 
-        const product =
-            products.find(
-                p => p.id === item.id
-            );
-
-
-        if (
-            item.quantity >
-            product.stock
+        for (
+            const item
+            of cart
         ) {
 
-            alert(
-                "Not enough stock: " +
-                product.name
-            );
+            const product =
+                products.find(
+                    p =>
+                        p.id ===
+                        item.id
+                );
 
-            return;
+
+            if (!product) {
+
+                alert(
+                    "Product not found."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                item.quantity >
+                product.stock
+            ) {
+
+                alert(
+                    "Not enough stock: " +
+                    product.name
+                );
+
+                return;
+
+            }
 
         }
 
-    }
+
+        /*
+         CALCULATE TOTAL
+        */
+
+        let total = 0;
 
 
-    /* REDUCE STOCK */
+        cart.forEach(
+            item => {
 
-    cart.forEach(item => {
+                total +=
+                    item.price *
+                    item.quantity;
 
-        const product =
-            products.find(
-                p => p.id === item.id
+            }
+        );
+
+
+        /*
+         PAYMENT
+        */
+
+        const payment =
+            document.getElementById(
+                "paymentMethod"
+            ).value;
+
+
+        /*
+         BILL OBJECT
+        */
+
+        const bill = {
+
+            number:
+                generateBillNumber(),
+
+            date:
+                new Date()
+                    .toLocaleString(
+                        "en-IN"
+                    ),
+
+            timestamp:
+                Date.now(),
+
+            payment:
+                payment,
+
+            items:
+                [...cart],
+
+            total:
+                total
+
+        };
+
+
+        /*
+         SAVE BILL
+         */
+
+        await saveBillToFirebase(
+            bill
+        );
+
+
+        /*
+         UPDATE FIREBASE STOCK
+         */
+
+        for (
+            const item
+            of cart
+        ) {
+
+            const product =
+                products.find(
+                    p =>
+                        p.id ===
+                        item.id
+                );
+
+
+            const newStock =
+                product.stock -
+                item.quantity;
+
+
+            await updateDoc(
+                doc(
+                    db,
+                    "products",
+                    product.id
+                ),
+                {
+                    stock:
+                        newStock
+                }
             );
 
 
-        product.stock -=
-            item.quantity;
+            product.stock =
+                newStock;
 
-    });
-
-
-    let total = 0;
+        }
 
 
-    cart.forEach(item => {
+        /*
+         UPDATE LOCAL MEMORY
+         */
 
-        total +=
-            item.price *
-            item.quantity;
-
-    });
+        bills.push(bill);
 
 
-    const bill = {
+        /*
+         SUCCESS
+         */
 
-        number:
-            generateBillNumber(),
-
-        date:
-            new Date()
-                .toLocaleString("en-IN"),
-
-        payment:
-            document.getElementById(
-                "paymentMethod"
-            ).value,
-
-        items:
-            [...cart],
-
-        total:
-            total
-
-    };
+        createReceipt(
+            bill
+        );
 
 
-    bills.push(bill);
+        alert(
+            "Bill completed successfully!"
+        );
 
 
-    saveData();
+        /*
+         CLEAR CART
+         */
+
+        cart = [];
 
 
-    createReceipt(bill);
+        renderCart();
 
+        renderProducts();
 
-    alert(
-        "Bill completed successfully!"
-    );
+        renderStock();
 
+        renderBills();
 
-    cart = [];
+        updateQuickInfo();
 
+        generateNextBillNumber();
 
-    renderCart();
+    }
 
+    catch (error) {
 
-    updateQuickInfo();
+        console.error(
+            error
+        );
 
+        alert(
+            "Bill save failed. Please check Firebase connection."
+        );
 
-    generateNextBillNumber();
+    }
 
 }
 
 
-
-/* =========================================
-   NEXT BILL NUMBER
-   ========================================= */
-
-function generateNextBillNumber() {
-
-    document.getElementById(
-        "billNumber"
-    ).textContent =
-        generateBillNumber();
-
-}
-
-
-
-/* =========================================
+/* =====================================================
    CLEAR CART
-   ========================================= */
+   ===================================================== */
 
 function clearCart() {
 
@@ -800,14 +1157,15 @@ function clearCart() {
 }
 
 
-
-/* =========================================
+/* =====================================================
    PRINT CURRENT BILL
-   ========================================= */
+   ===================================================== */
 
 function printCurrentBill() {
 
-    if (cart.length === 0) {
+    if (
+        cart.length === 0
+    ) {
 
         alert(
             "Cart is empty."
@@ -821,13 +1179,15 @@ function printCurrentBill() {
     let total = 0;
 
 
-    cart.forEach(item => {
+    cart.forEach(
+        item => {
 
-        total +=
-            item.price *
-            item.quantity;
+            total +=
+                item.price *
+                item.quantity;
 
-    });
+        }
+    );
 
 
     const bill = {
@@ -839,7 +1199,9 @@ function printCurrentBill() {
 
         date:
             new Date()
-                .toLocaleString("en-IN"),
+                .toLocaleString(
+                    "en-IN"
+                ),
 
         payment:
             document.getElementById(
@@ -855,7 +1217,9 @@ function printCurrentBill() {
     };
 
 
-    createReceipt(bill);
+    createReceipt(
+        bill
+    );
 
 
     window.print();
@@ -863,52 +1227,64 @@ function printCurrentBill() {
 }
 
 
-
-/* =========================================
+/* =====================================================
    CREATE RECEIPT
-   ========================================= */
+   ===================================================== */
 
-function createReceipt(bill) {
-
+function createReceipt(
+    bill
+) {
 
     let itemsHTML = "";
 
 
-    bill.items.forEach(item => {
+    bill.items.forEach(
+        item => {
 
-        itemsHTML += `
+            itemsHTML += `
 
-            <div class="receipt-line">
+                <div
+                    class="receipt-line"
+                >
 
-                <span>
-                    ${item.name}
-                    x${item.quantity}
-                </span>
+                    <span>
 
-                <span>
-                    ${money(
-                        item.price *
-                        item.quantity
-                    )}
-                </span>
+                        ${item.name}
+                        x${item.quantity}
 
-            </div>
+                    </span>
 
-        `;
+                    <span>
 
-    });
+                        ${money(
+                            item.price *
+                            item.quantity
+                        )}
+
+                    </span>
+
+                </div>
+
+            `;
+
+        }
+    );
 
 
     document.getElementById(
         "receipt"
     ).innerHTML = `
 
-        <h2>ROYAL STORE</h2>
+        <h2>
+            ROYAL STORE
+        </h2>
 
-        <div style="
-            text-align:center;
-            font-size:11px;
-        ">
+        <div
+            style="
+                text-align:center;
+                font-size:11px;
+            "
+        >
 
             Supermarket Billing
 
@@ -919,6 +1295,7 @@ function createReceipt(bill) {
 
 
         <p>
+
             Bill No:
             ${bill.number}
 
@@ -931,6 +1308,7 @@ function createReceipt(bill) {
 
             Payment:
             ${bill.payment}
+
         </p>
 
 
@@ -943,14 +1321,18 @@ function createReceipt(bill) {
         <hr>
 
 
-        <div class="receipt-line">
+        <div
+            class="receipt-line"
+        >
 
             <b>
                 GRAND TOTAL
             </b>
 
             <b>
-                ${money(bill.total)}
+                ${money(
+                    bill.total
+                )}
             </b>
 
         </div>
@@ -959,10 +1341,12 @@ function createReceipt(bill) {
         <hr>
 
 
-        <p style="
-            text-align:center;
-            font-size:11px;
-        ">
+        <p
+            style="
+                text-align:center;
+                font-size:11px;
+            "
+        >
 
             Thank You!
 
@@ -977,29 +1361,40 @@ function createReceipt(bill) {
 }
 
 
-
-/* =========================================
+/* =====================================================
    PRODUCT PAGE
-   ========================================= */
+   ===================================================== */
 
 function renderProducts() {
 
+    const filter =
+        document.getElementById(
+            "productFilter"
+        );
+
+
+    if (!filter) {
+
+        return;
+
+    }
+
+
     const search =
         (
-            document.getElementById(
-                "productFilter"
-            ).value || ""
+            filter.value || ""
         ).toLowerCase();
 
 
     const filtered =
-        products.filter(product =>
+        products.filter(
+            product =>
 
-            (
-                product.name +
-                " " +
-                product.category
-            )
+                (
+                    product.name +
+                    " " +
+                    product.category
+                )
                 .toLowerCase()
                 .includes(search)
 
@@ -1010,105 +1405,121 @@ function renderProducts() {
         "productTable"
     ).innerHTML =
 
-        filtered.map(product => {
+        filtered.map(
+            product => {
 
-            let status =
-                "Available";
+                let status =
+                    "Available";
 
-            let css =
-                "available";
+                let css =
+                    "available";
 
 
-            if (product.stock === 0) {
+                if (
+                    product.stock === 0
+                ) {
 
-                status =
-                    "Out of Stock";
+                    status =
+                        "Out of Stock";
 
-                css =
-                    "out";
+                    css =
+                        "out";
+
+                }
+
+                else if (
+                    product.stock <=
+                    product.alert
+                ) {
+
+                    status =
+                        "Low Stock";
+
+                    css =
+                        "low";
+
+                }
+
+
+                return `
+
+                    <tr>
+
+                        <td>
+
+                            <b>
+                                ${product.name}
+                            </b>
+
+                        </td>
+
+                        <td>
+                            ${product.category}
+                        </td>
+
+                        <td>
+                            ${money(
+                                product.price
+                            )}
+                        </td>
+
+                        <td>
+                            ${product.stock}
+                        </td>
+
+                        <td>
+                            ${product.alert}
+                        </td>
+
+                        <td>
+
+                            <span
+                                class="
+                                    status
+                                    ${css}
+                                "
+                            >
+
+                                ${status}
+
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <button
+                                class="
+                                    btn
+                                    green
+                                    small
+                                "
+                                onclick="
+                                    restock(
+                                        '${product.id}'
+                                    )
+                                "
+                            >
+
+                                + Stock
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                `;
 
             }
-
-            else if (
-                product.stock <=
-                product.alert
-            ) {
-
-                status =
-                    "Low Stock";
-
-                css =
-                    "low";
-
-            }
-
-
-            return `
-
-                <tr>
-
-                    <td>
-                        <b>
-                            ${product.name}
-                        </b>
-                    </td>
-
-                    <td>
-                        ${product.category}
-                    </td>
-
-                    <td>
-                        ${money(product.price)}
-                    </td>
-
-                    <td>
-                        ${product.stock}
-                    </td>
-
-                    <td>
-                        ${product.alert}
-                    </td>
-
-                    <td>
-
-                        <span
-                            class="status ${css}">
-
-                            ${status}
-
-                        </span>
-
-                    </td>
-
-                    <td>
-
-                        <button
-                            class="btn green small"
-                            onclick="
-                                restock(
-                                    ${product.id}
-                                )
-                            ">
-
-                            + Stock
-
-                        </button>
-
-                    </td>
-
-                </tr>
-
-            `;
-
-        }).join("");
+        ).join("");
 
 }
 
 
-
-/* =========================================
+/* =====================================================
    STOCK PAGE
-   ========================================= */
+   ===================================================== */
 
 function renderStock() {
 
@@ -1116,6 +1527,13 @@ function renderStock() {
         document.getElementById(
             "stockTable"
         );
+
+
+    if (!table) {
+
+        return;
+
+    }
 
 
     const warning =
@@ -1126,17 +1544,26 @@ function renderStock() {
 
     const low =
         products.filter(
-            p => p.stock <= p.alert
+            p =>
+                p.stock <=
+                p.alert
         );
 
 
-    if (low.length > 0) {
+    if (
+        low.length > 0
+    ) {
 
         warning.innerHTML = `
 
-            <div class="warning-box">
+            <div
+                class="warning-box"
+            >
 
-                ⚠ <b>Low Stock:</b>
+                ⚠
+                <b>
+                    Low Stock:
+                </b>
 
                 ${low.map(
                     p =>
@@ -1161,134 +1588,160 @@ function renderStock() {
 
     table.innerHTML =
 
-        products.map(product => {
+        products.map(
+            product => {
 
-            const used =
-                product.original -
-                product.stock;
-
-
-            const percentage =
-                product.original > 0
-
-                ? Math.round(
-                    (
-                        used /
-                        product.original
-                    ) * 100
-                )
-
-                : 0;
+                const used =
+                    product.original -
+                    product.stock;
 
 
-            let status =
-                "Available";
+                const percentage =
+                    product.original > 0
 
-            let css =
-                "available";
+                        ?
+
+                    Math.round(
+                        (
+                            used /
+                            product.original
+                        ) *
+                        100
+                    )
+
+                        :
+
+                    0;
 
 
-            if (product.stock === 0) {
+                let status =
+                    "Available";
 
-                status =
-                    "Out of Stock";
+                let css =
+                    "available";
 
-                css =
-                    "out";
+
+                if (
+                    product.stock === 0
+                ) {
+
+                    status =
+                        "Out of Stock";
+
+                    css =
+                        "out";
+
+                }
+
+                else if (
+                    product.stock <=
+                    product.alert
+                ) {
+
+                    status =
+                        "Low Stock";
+
+                    css =
+                        "low";
+
+                }
+
+
+                return `
+
+                    <tr>
+
+                        <td>
+
+                            <b>
+                                ${product.name}
+                            </b>
+
+                        </td>
+
+                        <td>
+                            ${product.category}
+                        </td>
+
+                        <td>
+                            ${product.stock}
+                        </td>
+
+                        <td>
+                            ${product.original}
+                        </td>
+
+                        <td>
+                            ${used}
+                        </td>
+
+                        <td>
+                            ${percentage}%
+                        </td>
+
+                        <td>
+
+                            <span
+                                class="
+                                    status
+                                    ${css}
+                                "
+                            >
+
+                                ${status}
+
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <button
+                                class="
+                                    btn
+                                    green
+                                    small
+                                "
+                                onclick="
+                                    restock(
+                                        '${product.id}'
+                                    )
+                                "
+                            >
+
+                                + Stock
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                `;
 
             }
-
-            else if (
-                product.stock <=
-                product.alert
-            ) {
-
-                status =
-                    "Low Stock";
-
-                css =
-                    "low";
-
-            }
-
-
-            return `
-
-                <tr>
-
-                    <td>
-                        <b>
-                            ${product.name}
-                        </b>
-                    </td>
-
-                    <td>
-                        ${product.category}
-                    </td>
-
-                    <td>
-                        ${product.stock}
-                    </td>
-
-                    <td>
-                        ${product.original}
-                    </td>
-
-                    <td>
-                        ${used}
-                    </td>
-
-                    <td>
-                        ${percentage}%
-                    </td>
-
-                    <td>
-
-                        <span
-                            class="status ${css}">
-
-                            ${status}
-
-                        </span>
-
-                    </td>
-
-                    <td>
-
-                        <button
-                            class="btn green small"
-                            onclick="
-                                restock(
-                                    ${product.id}
-                                )
-                            ">
-
-                            + Stock
-
-                        </button>
-
-                    </td>
-
-                </tr>
-
-            `;
-
-        }).join("");
+        ).join("");
 
 }
 
 
-
-/* =========================================
+/* =====================================================
    RESTOCK
-   ========================================= */
+   ===================================================== */
 
-function restock(id) {
+async function restock(id) {
 
     const product =
         products.find(
             p => p.id === id
         );
+
+
+    if (!product) {
+
+        return;
+
+    }
 
 
     const amount =
@@ -1301,18 +1754,51 @@ function restock(id) {
 
 
     if (
-        amount &&
-        amount > 0
+        !amount ||
+        amount <= 0
     ) {
 
-        product.stock +=
+        return;
+
+    }
+
+
+    try {
+
+        const newStock =
+            product.stock +
             amount;
 
-        product.original +=
+
+        const newOriginal =
+            product.original +
             amount;
 
 
-        saveData();
+        await updateDoc(
+            doc(
+                db,
+                "products",
+                id
+            ),
+            {
+
+                stock:
+                    newStock,
+
+                original:
+                    newOriginal
+
+            }
+        );
+
+
+        product.stock =
+            newStock;
+
+
+        product.original =
+            newOriginal;
 
 
         renderProducts();
@@ -1321,15 +1807,31 @@ function restock(id) {
 
         updateQuickInfo();
 
+
+        alert(
+            "Stock updated successfully!"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            error
+        );
+
+        alert(
+            "Stock update failed."
+        );
+
     }
 
 }
 
 
-
-/* =========================================
+/* =====================================================
    ADD PRODUCT MODAL
-   ========================================= */
+   ===================================================== */
 
 function openProductModal() {
 
@@ -1338,7 +1840,9 @@ function openProductModal() {
             "productModal"
         )
         .classList
-        .remove("hidden");
+        .remove(
+            "hidden"
+        );
 
 }
 
@@ -1350,18 +1854,18 @@ function closeProductModal() {
             "productModal"
         )
         .classList
-        .add("hidden");
+        .add(
+            "hidden"
+        );
 
 }
 
 
-
-/* =========================================
+/* =====================================================
    SAVE PRODUCT
-   ========================================= */
+   ===================================================== */
 
-function saveProduct() {
-
+async function saveProduct() {
 
     const name =
         document.getElementById(
@@ -1403,7 +1907,8 @@ function saveProduct() {
         !name ||
         !category ||
         price <= 0 ||
-        stock < 0
+        stock < 0 ||
+        alertLevel < 0
     ) {
 
         alert(
@@ -1415,76 +1920,114 @@ function saveProduct() {
     }
 
 
-    products.push({
+    try {
 
-        id:
-            Date.now(),
+        const product = {
 
-        name:
-            name,
+            name:
+                name,
 
-        category:
-            category,
+            category:
+                category,
 
-        price:
-            price,
+            price:
+                price,
 
-        stock:
-            stock,
+            stock:
+                stock,
 
-        original:
-            stock,
+            original:
+                stock,
 
-        alert:
-            alertLevel
+            alert:
+                alertLevel,
 
-    });
+            createdAt:
+                Date.now()
 
-
-    saveData();
-
-
-    document.getElementById(
-        "productName"
-    ).value = "";
+        };
 
 
-    document.getElementById(
-        "productCategory"
-    ).value = "";
+        const docRef =
+            await addDoc(
+                productsRef,
+                product
+            );
 
 
-    document.getElementById(
-        "productPrice"
-    ).value = "";
+        products.push({
+
+            id:
+                docRef.id,
+
+            ...product
+
+        });
 
 
-    document.getElementById(
-        "productStock"
-    ).value = "";
+        /*
+         CLEAR FORM
+        */
+
+        document.getElementById(
+            "productName"
+        ).value = "";
 
 
-    document.getElementById(
-        "productAlert"
-    ).value = "";
+        document.getElementById(
+            "productCategory"
+        ).value = "";
 
 
-    closeProductModal();
+        document.getElementById(
+            "productPrice"
+        ).value = "";
 
 
-    renderProducts();
+        document.getElementById(
+            "productStock"
+        ).value = "";
 
-    renderStock();
 
-    updateQuickInfo();
+        document.getElementById(
+            "productAlert"
+        ).value = "";
+
+
+        closeProductModal();
+
+
+        renderProducts();
+
+        renderStock();
+
+        updateQuickInfo();
+
+
+        alert(
+            "Product added successfully!"
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            error
+        );
+
+        alert(
+            "Product save failed."
+        );
+
+    }
 
 }
 
 
-
-/* =========================================
+/* =====================================================
    BILL LIST
-   ========================================= */
+   ===================================================== */
 
 function renderBills() {
 
@@ -1494,14 +2037,25 @@ function renderBills() {
         );
 
 
-    if (bills.length === 0) {
+    if (!table) {
+
+        return;
+
+    }
+
+
+    if (
+        bills.length === 0
+    ) {
 
         table.innerHTML = `
 
             <tr>
 
-                <td colspan="6"
-                    class="empty">
+                <td
+                    colspan="6"
+                    class="empty"
+                >
 
                     No bills available.
 
@@ -1520,116 +2074,193 @@ function renderBills() {
 
         bills
             .slice()
-            .reverse()
-            .map(bill => {
+            .sort(
+                (
+                    a,
+                    b
+                ) =>
+                    (
+                        b.timestamp ||
+                        0
+                    ) -
+                    (
+                        a.timestamp ||
+                        0
+                    )
+            )
+            .map(
+                bill => {
 
-                return `
+                    return `
 
-                    <tr>
+                        <tr>
 
-                        <td>
-                            <b>
-                                ${bill.number}
-                            </b>
-                        </td>
+                            <td>
 
-                        <td>
-                            ${bill.date}
-                        </td>
+                                <b>
+                                    ${bill.number}
+                                </b>
 
-                        <td>
-                            ${bill.items.length}
-                        </td>
+                            </td>
 
-                        <td>
-                            <b>
-                                ${money(
-                                    bill.total
+                            <td>
+                                ${bill.date}
+                            </td>
+
+                            <td>
+                                ${bill.items.reduce(
+                                    (
+                                        sum,
+                                        item
+                                    ) =>
+                                        sum +
+                                        item.quantity,
+                                    0
                                 )}
-                            </b>
-                        </td>
+                            </td>
 
-                        <td>
-                            ${bill.payment}
-                        </td>
+                            <td>
 
-                        <td>
+                                <b>
+                                    ${money(
+                                        bill.total
+                                    )}
+                                </b>
 
-                            <button
-                                class="btn blue small"
-                                onclick='
-                                    printSavedBill(
-                                        ${JSON.stringify(bill)}
-                                    )
-                                '>
+                            </td>
 
-                                Print
+                            <td>
+                                ${bill.payment}
+                            </td>
 
-                            </button>
+                            <td>
 
-                        </td>
+                                <button
+                                    class="
+                                        btn
+                                        blue
+                                        small
+                                    "
+                                    onclick="
+                                        printSavedBill(
+                                            '${bill.id}'
+                                        )
+                                    "
+                                >
 
-                    </tr>
+                                    Print
 
-                `;
+                                </button>
 
-            })
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                }
+            )
             .join("");
 
 }
 
 
-
-/* =========================================
+/* =====================================================
    PRINT SAVED BILL
-   ========================================= */
+   ===================================================== */
 
-function printSavedBill(bill) {
+function printSavedBill(
+    id
+) {
 
-    createReceipt(bill);
+    const bill =
+        bills.find(
+            b => b.id === id
+        );
+
+
+    if (!bill) {
+
+        alert(
+            "Bill not found."
+        );
+
+        return;
+
+    }
+
+
+    createReceipt(
+        bill
+    );
+
 
     window.print();
 
 }
 
 
-
-/* =========================================
+/* =====================================================
    QUICK INFO
-   ========================================= */
+   ===================================================== */
 
 function updateQuickInfo() {
 
-    document.getElementById(
-        "productCount"
-    ).textContent =
-        products.length;
+    const productCount =
+        document.getElementById(
+            "productCount"
+        );
 
 
-    document.getElementById(
-        "quickLowStock"
-    ).textContent =
+    const quickLowStock =
+        document.getElementById(
+            "quickLowStock"
+        );
 
+
+    const lowStockCount =
+        document.getElementById(
+            "lowStockCount"
+        );
+
+
+    const low =
         products.filter(
-            p => p.stock <= p.alert
+            p =>
+                p.stock <=
+                p.alert
         ).length;
 
 
-    document.getElementById(
-        "lowStockCount"
-    ).textContent =
+    if (productCount) {
 
-        products.filter(
-            p => p.stock <= p.alert
-        ).length;
+        productCount.textContent =
+            products.length;
+
+    }
+
+
+    if (quickLowStock) {
+
+        quickLowStock.textContent =
+            low;
+
+    }
+
+
+    if (lowStockCount) {
+
+        lowStockCount.textContent =
+            low;
+
+    }
 
 }
 
 
-
-/* =========================================
-   PRODUCT SEARCH FILTER
-   ========================================= */
+/* =====================================================
+   PRODUCT FILTER
+   ===================================================== */
 
 document
     .getElementById(
@@ -1641,39 +2272,111 @@ document
     );
 
 
-
-/* =========================================
+/* =====================================================
    DATE
-   ========================================= */
+   ===================================================== */
 
 document.getElementById(
     "currentDate"
 ).textContent =
 
-    new Date().toLocaleDateString(
-        "en-IN",
-        {
-            weekday: "short",
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        }
+    new Date()
+        .toLocaleDateString(
+            "en-IN",
+            {
+
+                weekday:
+                    "short",
+
+                day:
+                    "2-digit",
+
+                month:
+                    "short",
+
+                year:
+                    "numeric"
+
+            }
+        );
+
+
+/* =====================================================
+   SEARCH RENDER
+   ===================================================== */
+
+function renderSearch() {
+
+    /*
+     Nothing required here.
+     Product search uses live products array.
+    */
+
+}
+
+
+/* =====================================================
+   INITIAL LOAD
+   ===================================================== */
+
+async function initializeAppData() {
+
+    console.log(
+        "Connecting to Firebase..."
     );
 
 
+    await loadProducts();
 
-/* =========================================
-   INITIAL LOAD
-   ========================================= */
+    await loadBills();
 
-updateQuickInfo();
 
-renderCart();
+    console.log(
+        "Royal Store Firebase backend ready."
+    );
 
-renderProducts();
+}
 
-renderStock();
 
-renderBills();
+initializeAppData();
 
-generateNextBillNumber();
+
+/* =====================================================
+   MAKE FUNCTIONS AVAILABLE TO HTML ONCLICK
+   ===================================================== */
+
+window.openPage =
+    openPage;
+
+window.addToCart =
+    addToCart;
+
+window.updateQuantity =
+    updateQuantity;
+
+window.removeCart =
+    removeCart;
+
+window.completeBill =
+    completeBill;
+
+window.clearCart =
+    clearCart;
+
+window.printCurrentBill =
+    printCurrentBill;
+
+window.openProductModal =
+    openProductModal;
+
+window.closeProductModal =
+    closeProductModal;
+
+window.saveProduct =
+    saveProduct;
+
+window.restock =
+    restock;
+
+window.printSavedBill =
+    printSavedBill;
