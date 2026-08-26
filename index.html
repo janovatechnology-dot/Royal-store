@@ -1,53 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>Royal Store - Billing</title>
 
     <link rel="stylesheet" href="style.css">
+
 </head>
+
 
 <body>
 
+
 <div class="app">
 
-    <!-- SIDEBAR -->
+
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
 
     <aside class="sidebar">
 
+
         <div class="store-logo">
-            <div class="logo">R</div>
+
+            <div class="logo">
+                R
+            </div>
 
             <div>
-                <h2>ROYAL STORE</h2>
-                <span>Billing System</span>
+
+                <h2>
+                    ROYAL STORE
+                </h2>
+
+                <span>
+                    Billing System
+                </span>
+
             </div>
+
         </div>
 
 
         <div class="menu">
 
-            <button class="menu-btn active"
-                    onclick="openPage('billing', this)">
-                🧾 <span>New Bill</span>
+
+            <button
+                class="menu-btn active"
+                onclick="openPage('billing', this)"
+            >
+
+                🧾
+                <span>
+                    New Bill
+                </span>
+
             </button>
 
-            <button class="menu-btn"
-                    onclick="openPage('products', this)">
-                📦 <span>Products</span>
+
+            <button
+                class="menu-btn"
+                onclick="openPage('products', this)"
+            >
+
+                📦
+                <span>
+                    Products
+                </span>
+
             </button>
 
-            <button class="menu-btn"
-                    onclick="openPage('stock', this)">
-                📊 <span>Stock</span>
+
+            <button
+                class="menu-btn"
+                onclick="openPage('stock', this)"
+            >
+
+                📊
+                <span>
+                    Stock
+                </span>
+
             </button>
 
-            <button class="menu-btn"
-                    onclick="openPage('bills', this)">
-                🗂️ <span>Bill List</span>
+
+            <button
+                class="menu-btn"
+                onclick="openPage('bills', this)"
+            >
+
+                🗂️
+                <span>
+                    Bill List
+                </span>
+
             </button>
+
 
         </div>
 
@@ -55,89 +110,129 @@
         <div class="sidebar-bottom">
 
             <div class="store-status">
+
                 <span class="online-dot"></span>
+
                 Store Online
+
             </div>
 
         </div>
 
+
     </aside>
 
 
-    <!-- MAIN -->
+
+    <!-- =====================================================
+         MAIN
+         ===================================================== -->
 
     <main class="main">
+
 
         <!-- TOP BAR -->
 
         <header class="topbar">
 
+
             <div>
-                <h1 id="pageTitle">New Bill</h1>
+
+                <h1 id="pageTitle">
+                    New Bill
+                </h1>
 
                 <p>
                     Royal Store Billing
                 </p>
+
             </div>
 
 
             <div class="top-actions">
 
-                <div class="stock-alert"
-                     onclick="openPage('stock')">
+
+                <div
+                    class="stock-alert"
+                    onclick="openPage('stock')"
+                >
 
                     🔔
-                    <span id="lowStockCount">0</span>
+
+                    <span id="lowStockCount">
+                        0
+                    </span>
 
                 </div>
 
-                <div class="date"
-                     id="currentDate">
+
+                <div
+                    class="date"
+                    id="currentDate"
+                >
                 </div>
+
 
             </div>
+
 
         </header>
 
 
 
-        <!-- ================= BILLING ================= -->
+        <!-- =====================================================
+             BILLING PAGE
+             ===================================================== -->
 
-        <section id="billingPage"
-                 class="page">
+        <section
+            id="billingPage"
+            class="page"
+        >
+
 
             <div class="billing-container">
 
 
-                <!-- PRODUCT SEARCH / CART -->
+                <!-- LEFT -->
 
                 <div class="billing-left">
 
+
                     <div class="panel">
+
 
                         <div class="bill-header">
 
+
                             <div>
 
-                                <h2>🧾 New Bill</h2>
+                                <h2>
+                                    🧾 New Bill
+                                </h2>
 
                                 <p>
+
                                     Bill No:
                                     <b id="billNumber"></b>
+
                                 </p>
 
                             </div>
+
 
                             <span class="live">
                                 ● LIVE
                             </span>
 
+
                         </div>
+
 
 
                         <!-- SEARCH -->
 
                         <div class="search-area">
+
 
                             <input
                                 type="text"
@@ -146,32 +241,48 @@
                                 autocomplete="off"
                             >
 
-                            <div id="searchResults"
-                                 class="search-results">
+
+                            <div
+                                id="searchResults"
+                                class="search-results"
+                            >
                             </div>
 
+
                         </div>
+
 
 
                         <!-- CART -->
 
                         <div class="cart-table">
 
+
                             <table>
+
 
                                 <thead>
 
                                     <tr>
 
-                                        <th>Product</th>
+                                        <th>
+                                            Product
+                                        </th>
 
-                                        <th>Price</th>
+                                        <th>
+                                            Price
+                                        </th>
 
-                                        <th>Qty</th>
+                                        <th>
+                                            Qty
+                                        </th>
 
-                                        <th>Total</th>
+                                        <th>
+                                            Total
+                                        </th>
 
-                                        <th></th>
+                                        <th>
+                                        </th>
 
                                     </tr>
 
@@ -180,10 +291,13 @@
 
                                 <tbody id="cartBody">
 
+
                                     <tr>
 
-                                        <td colspan="5"
-                                            class="empty">
+                                        <td
+                                            colspan="5"
+                                            class="empty"
+                                        >
 
                                             Search a product
                                             to add it to the bill
@@ -192,30 +306,41 @@
 
                                     </tr>
 
+
                                 </tbody>
+
 
                             </table>
 
+
                         </div>
 
+
                     </div>
+
 
                 </div>
 
 
 
-                <!-- BILL SUMMARY -->
+                <!-- RIGHT -->
 
                 <div class="billing-right">
 
+
                     <div class="panel summary">
 
-                        <h2>Bill Summary</h2>
+
+                        <h2>
+                            Bill Summary
+                        </h2>
 
 
                         <div class="summary-line">
 
-                            <span>Total Items</span>
+                            <span>
+                                Total Items
+                            </span>
 
                             <b id="totalItems">
                                 0
@@ -226,7 +351,9 @@
 
                         <div class="summary-line">
 
-                            <span>Subtotal</span>
+                            <span>
+                                Subtotal
+                            </span>
 
                             <b id="subtotal">
                                 ₹0.00
@@ -237,7 +364,9 @@
 
                         <div class="grand-total">
 
-                            <span>Grand Total</span>
+                            <span>
+                                Grand Total
+                            </span>
 
                             <strong id="grandTotal">
                                 ₹0.00
@@ -253,18 +382,25 @@
 
                         <select id="paymentMethod">
 
-                            <option>Cash</option>
+                            <option>
+                                Cash
+                            </option>
 
-                            <option>UPI</option>
+                            <option>
+                                UPI
+                            </option>
 
-                            <option>Card</option>
+                            <option>
+                                Card
+                            </option>
 
                         </select>
 
 
                         <button
                             class="btn green"
-                            onclick="completeBill()">
+                            onclick="completeBill()"
+                        >
 
                             ✓ Complete Bill
 
@@ -273,7 +409,8 @@
 
                         <button
                             class="btn blue"
-                            onclick="printCurrentBill()">
+                            onclick="printCurrentBill()"
+                        >
 
                             🖨 Print Bill
 
@@ -282,53 +419,82 @@
 
                         <button
                             class="btn gray"
-                            onclick="clearCart()">
+                            onclick="clearCart()"
+                        >
 
                             Clear
 
                         </button>
 
+
                     </div>
+
 
 
                     <!-- QUICK INFO -->
 
                     <div class="panel quick-info">
 
-                        <h3>Quick Info</h3>
+
+                        <h3>
+                            Quick Info
+                        </h3>
+
 
                         <p>
+
                             📦 Products:
-                            <b id="productCount">0</b>
+                            <b id="productCount">
+                                0
+                            </b>
+
                         </p>
 
+
                         <p>
+
                             ⚠ Low Stock:
-                            <b id="quickLowStock">0</b>
+                            <b id="quickLowStock">
+                                0
+                            </b>
+
                         </p>
+
 
                     </div>
 
+
                 </div>
 
+
             </div>
+
 
         </section>
 
 
 
-        <!-- ================= PRODUCTS ================= -->
+        <!-- =====================================================
+             PRODUCTS PAGE
+             ===================================================== -->
 
-        <section id="productsPage"
-                 class="page hidden">
+        <section
+            id="productsPage"
+            class="page hidden"
+        >
+
 
             <div class="panel">
 
+
                 <div class="page-heading">
+
 
                     <div>
 
-                        <h2>📦 Products</h2>
+                        <h2>
+                            📦 Products
+                        </h2>
 
                         <p>
                             Manage store products
@@ -339,11 +505,13 @@
 
                     <button
                         class="btn green small"
-                        onclick="openProductModal()">
+                        onclick="openProductModal()"
+                    >
 
                         + Add Product
 
                     </button>
+
 
                 </div>
 
@@ -357,25 +525,41 @@
 
                 <div class="table-scroll">
 
+
                     <table>
+
 
                         <thead>
 
                             <tr>
 
-                                <th>Product</th>
+                                <th>
+                                    Product
+                                </th>
 
-                                <th>Category</th>
+                                <th>
+                                    Category
+                                </th>
 
-                                <th>Price</th>
+                                <th>
+                                    Price
+                                </th>
 
-                                <th>Stock</th>
+                                <th>
+                                    Stock
+                                </th>
 
-                                <th>Alert Level</th>
+                                <th>
+                                    Alert Level
+                                </th>
 
-                                <th>Status</th>
+                                <th>
+                                    Status
+                                </th>
 
-                                <th>Action</th>
+                                <th>
+                                    Action
+                                </th>
 
                             </tr>
 
@@ -383,31 +567,43 @@
 
 
                         <tbody id="productTable">
-
                         </tbody>
+
 
                     </table>
 
+
                 </div>
 
+
             </div>
+
 
         </section>
 
 
 
-        <!-- ================= STOCK ================= -->
+        <!-- =====================================================
+             STOCK PAGE
+             ===================================================== -->
 
-        <section id="stockPage"
-                 class="page hidden">
+        <section
+            id="stockPage"
+            class="page hidden"
+        >
+
 
             <div class="panel">
 
+
                 <div class="page-heading">
+
 
                     <div>
 
-                        <h2>📊 Stock Management</h2>
+                        <h2>
+                            📊 Stock Management
+                        </h2>
 
                         <p>
                             Monitor Royal Store stock
@@ -415,38 +611,58 @@
 
                     </div>
 
+
                 </div>
 
 
-                <div class="stock-warning"
-                     id="stockWarning">
-
+                <div
+                    class="stock-warning"
+                    id="stockWarning"
+                >
                 </div>
 
 
                 <div class="table-scroll">
 
+
                     <table>
+
 
                         <thead>
 
                             <tr>
 
-                                <th>Product</th>
+                                <th>
+                                    Product
+                                </th>
 
-                                <th>Category</th>
+                                <th>
+                                    Category
+                                </th>
 
-                                <th>Available</th>
+                                <th>
+                                    Available
+                                </th>
 
-                                <th>Original</th>
+                                <th>
+                                    Original
+                                </th>
 
-                                <th>Used</th>
+                                <th>
+                                    Used
+                                </th>
 
-                                <th>Usage</th>
+                                <th>
+                                    Usage
+                                </th>
 
-                                <th>Status</th>
+                                <th>
+                                    Status
+                                </th>
 
-                                <th>Action</th>
+                                <th>
+                                    Action
+                                </th>
 
                             </tr>
 
@@ -454,31 +670,43 @@
 
 
                         <tbody id="stockTable">
-
                         </tbody>
+
 
                     </table>
 
+
                 </div>
 
+
             </div>
+
 
         </section>
 
 
 
-        <!-- ================= BILL LIST ================= -->
+        <!-- =====================================================
+             BILL LIST PAGE
+             ===================================================== -->
 
-        <section id="billsPage"
-                 class="page hidden">
+        <section
+            id="billsPage"
+            class="page hidden"
+        >
+
 
             <div class="panel">
 
+
                 <div class="page-heading">
+
 
                     <div>
 
-                        <h2>🗂️ Bill List</h2>
+                        <h2>
+                            🗂️ Bill List
+                        </h2>
 
                         <p>
                             Previous Royal Store bills
@@ -486,28 +714,179 @@
 
                     </div>
 
+
                 </div>
 
 
+
+                <!-- BILL REPORT FILTER -->
+
+                <div class="bill-report">
+
+
+                    <div class="report-title">
+
+                        <h3>
+                            📊 Sales Report
+                        </h3>
+
+                        <span>
+                            Filter bills by period
+                        </span>
+
+                    </div>
+
+
+                    <div class="report-filters">
+
+
+                        <button
+                            class="report-btn active"
+                            data-period="today"
+                            onclick="filterBills('today', this)"
+                        >
+
+                            Today
+
+                        </button>
+
+
+                        <button
+                            class="report-btn"
+                            data-period="week"
+                            onclick="filterBills('week', this)"
+                        >
+
+                            This Week
+
+                        </button>
+
+
+                        <button
+                            class="report-btn"
+                            data-period="month"
+                            onclick="filterBills('month', this)"
+                        >
+
+                            This Month
+
+                        </button>
+
+
+                        <button
+                            class="report-btn"
+                            data-period="all"
+                            onclick="filterBills('all', this)"
+                        >
+
+                            All Bills
+
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- REPORT CARDS -->
+
+                <div class="report-cards">
+
+
+                    <div class="report-card">
+
+                        <span>
+                            🧾 Bills
+                        </span>
+
+                        <strong id="reportBillCount">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="report-card">
+
+                        <span>
+                            📦 Items Sold
+                        </span>
+
+                        <strong id="reportItemCount">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="report-card">
+
+                        <span>
+                            💰 Total Sales
+                        </span>
+
+                        <strong id="reportSalesTotal">
+                            ₹0.00
+                        </strong>
+
+                    </div>
+
+
+                    <div class="report-card">
+
+                        <span>
+                            💳 Average Bill
+                        </span>
+
+                        <strong id="reportAverage">
+                            ₹0.00
+                        </strong>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- BILL TABLE -->
+
                 <div class="table-scroll">
 
+
                     <table>
+
 
                         <thead>
 
                             <tr>
 
-                                <th>Bill No</th>
+                                <th>
+                                    Bill No
+                                </th>
 
-                                <th>Date</th>
+                                <th>
+                                    Date
+                                </th>
 
-                                <th>Items</th>
+                                <th>
+                                    Items
+                                </th>
 
-                                <th>Amount</th>
+                                <th>
+                                    Amount
+                                </th>
 
-                                <th>Payment</th>
+                                <th>
+                                    Payment
+                                </th>
 
-                                <th>Action</th>
+                                <th>
+                                    Action
+                                </th>
 
                             </tr>
 
@@ -515,37 +894,57 @@
 
 
                         <tbody id="billTable">
-
                         </tbody>
+
 
                     </table>
 
+
                 </div>
+
 
             </div>
 
+
         </section>
 
+
     </main>
+
 
 </div>
 
 
 
-<!-- ================= ADD PRODUCT MODAL ================= -->
+<!-- =====================================================
+     ADD PRODUCT MODAL
+     ===================================================== -->
 
-<div id="productModal"
-     class="modal hidden">
+<div
+    id="productModal"
+    class="modal hidden"
+>
+
 
     <div class="modal-box">
 
+
         <div class="modal-header">
 
-            <h2>Add Product</h2>
 
-            <button onclick="closeProductModal()">
+            <h2>
+                Add Product
+            </h2>
+
+
+            <button
+                onclick="closeProductModal()"
+            >
+
                 ×
+
             </button>
+
 
         </div>
 
@@ -585,23 +984,132 @@
 
         <button
             class="btn green"
-            onclick="saveProduct()">
+            onclick="saveProduct()"
+        >
 
             Save Product
 
         </button>
 
+
     </div>
+
 
 </div>
 
 
 
-<!-- ================= RECEIPT ================= -->
+<!-- =====================================================
+     RECEIPT
+     ===================================================== -->
 
-<div id="receipt" class="receipt"></div>
+<div
+    id="receipt"
+    class="receipt"
+>
+</div>
 
-<script type="module" src="script.js"></script>
+
+
+<!-- =====================================================
+     SUCCESS TOAST
+     ===================================================== -->
+
+<div
+    id="successToast"
+    class="success-toast"
+>
+
+    <div class="success-icon">
+        ✓
+    </div>
+
+
+    <div>
+
+        <strong>
+            Bill Completed
+        </strong>
+
+        <span id="successMessage">
+            Bill saved successfully
+        </span>
+
+    </div>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     DELETE CONFIRMATION MODAL
+     ===================================================== -->
+
+<div
+    id="deleteModal"
+    class="delete-modal hidden"
+>
+
+
+    <div class="delete-box">
+
+
+        <div class="delete-icon">
+            🗑️
+        </div>
+
+
+        <h2>
+            Delete Bill?
+        </h2>
+
+
+        <p>
+            This bill will be permanently removed from
+            your Bill List.
+        </p>
+
+
+        <div class="delete-actions">
+
+
+            <button
+                class="btn gray"
+                onclick="closeDeleteModal()"
+            >
+
+                Cancel
+
+            </button>
+
+
+            <button
+                class="btn danger"
+                onclick="confirmDeleteBill()"
+            >
+
+                Delete Bill
+
+            </button>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+
+<script
+    type="module"
+    src="script.js"
+></script>
+
 
 </body>
+
 </html>
