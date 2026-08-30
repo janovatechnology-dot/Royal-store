@@ -543,6 +543,12 @@ td {
 }
 
 
+.danger {
+    background: #dc2626;
+    color: white;
+}
+
+
 .small {
     width: auto;
 
@@ -667,9 +673,88 @@ td {
 }
 
 
+/* ================= REPORT CARDS ================= */
+
+.bill-report {
+    margin-bottom: 20px;
+}
+
+.report-title h3 {
+    margin: 0 0 4px 0;
+}
+
+.report-title span {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.report-filters {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.report-btn {
+    padding: 8px 16px;
+    border: 1px solid #d6dce5;
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #4b5563;
+}
+
+.report-btn.active {
+    background: #16a36d;
+    color: white;
+    border-color: #16a36d;
+}
+
+.report-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.report-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.report-card span {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.report-card strong {
+    font-size: 20px;
+    color: #0f172a;
+}
+
+.bill-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.payment-badge {
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+
 /* ================= MODAL ================= */
 
-.modal {
+.modal, .delete-modal {
     position: fixed;
 
     inset: 0;
@@ -686,7 +771,7 @@ td {
 }
 
 
-.modal-box {
+.modal-box, .delete-box {
     width: 400px;
 
     max-width: 92%;
@@ -735,6 +820,65 @@ td {
     border-radius: 8px;
 
     outline: none;
+}
+
+.delete-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.delete-box h2 {
+    margin: 0 0 10px 0;
+}
+
+.delete-box p {
+    color: #64748b;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+.delete-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.success-toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #111827;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.success-toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.success-icon {
+    width: 28px;
+    height: 28px;
+    background: #16a36d;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.success-icon.error-icon {
+    background: #dc2626;
 }
 
 
@@ -822,88 +966,6 @@ td {
 
     .topbar {
         align-items: flex-start;
-    }
-
-}
-
-
-@media (max-width: 500px) {
-
-    .topbar {
-        display: block;
-    }
-
-
-    .top-actions {
-        margin-top: 12px;
-    }
-
-
-    .date {
-        font-size: 11px;
-    }
-
-
-    .menu-btn {
-        min-width: 90px;
-
-        font-size: 12px;
-    }
-
-}
-
-
-/* ================= PRINT ================= */
-
-@media print {
-
-    body * {
-        visibility: hidden;
-    }
-
-
-    .receipt,
-    .receipt * {
-        visibility: visible;
-    }
-
-
-    .receipt {
-        display: block !important;
-
-        position: absolute;
-
-        top: 0;
-        left: 0;
-
-        width: 80mm;
-
-        padding: 10px;
-
-        font-family: monospace;
-    }
-
-
-    .receipt h2 {
-        text-align: center;
-    }
-
-
-    .receipt-line {
-        display: flex;
-
-        justify-content: space-between;
-
-        font-size: 12px;
-
-        margin: 5px 0;
-    }
-
-
-    .receipt hr {
-        border: none;
-
-        border-top: 1px dashed #000;
     }
 
 }
