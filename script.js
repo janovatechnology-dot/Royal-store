@@ -1318,37 +1318,9 @@ function printCurrentBill() {
 
 
 
-/* =====================================================
-   PRINT SAVED BILL
-   ===================================================== */
-
-function printSavedBill(id) {
-
-    const bill =
-        bills.find(
-            b => b.id === id
-        );
 
 
-    if (!bill) {
-
-        showError(
-            "Bill not found."
-        );
-
-        return;
-
-    }
-
-
-    printReceipt(
-        bill
-    );
-
-}
-
-
-
+                
 /* =====================================================
    REAL PRINT FUNCTION
    ===================================================== */
@@ -1614,6 +1586,16 @@ function printReceipt(bill) {
 
             </div>
 
+            <script>
+                window.onafterprint = function () {
+                    window.close();
+                };
+                
+                window.onload = function () {
+                    window.focus();
+                    window.print();
+                };
+            </script>
 
         </body>
 
@@ -1623,170 +1605,6 @@ function printReceipt(bill) {
 
 
     printWindow.document.close();
-
-
-    printWindow.focus();
-
-
-    setTimeout(
-        () => {
-
-            printWindow.print();
-
-            setTimeout(
-                () => {
-
-                    printWindow.close();
-
-                },
-                500
-            );
-
-        },
-        400
-    );
-
-}
-
-
-
-/* =====================================================
-   CREATE RECEIPT
-   ===================================================== */
-
-function createReceipt(bill) {
-
-    let itemsHTML = "";
-
-
-    bill.items.forEach(
-        item => {
-
-            itemsHTML += `
-
-                <div
-                    class="receipt-line"
-                >
-
-                    <span>
-
-                        ${escapeHTML(
-                            item.name
-                        )}
-
-                        x${item.quantity}
-
-                    </span>
-
-                    <span>
-
-                        ${money(
-                            item.price *
-                            item.quantity
-                        )}
-
-                    </span>
-
-                </div>
-
-            `;
-
-        }
-    );
-
-
-    document.getElementById(
-        "receipt"
-    ).innerHTML = `
-
-        <h2>
-            ROYAL STORE
-        </h2>
-
-        <div
-            style="
-                text-align:center;
-                font-size:11px;
-            "
-        >
-
-            Supermarket Billing
-
-        </div>
-
-
-        <hr>
-
-
-        <p>
-
-            Bill No:
-            ${escapeHTML(
-                bill.number
-            )}
-
-            <br>
-
-            Date:
-            ${escapeHTML(
-                bill.date
-            )}
-
-            <br>
-
-            Payment:
-            ${escapeHTML(
-                bill.payment
-            )}
-
-        </p>
-
-
-        <hr>
-
-
-        ${itemsHTML}
-
-
-        <hr>
-
-
-        <div
-            class="receipt-line"
-        >
-
-            <b>
-                GRAND TOTAL
-            </b>
-
-            <b>
-                ${money(
-                    bill.total
-                )}
-            </b>
-
-        </div>
-
-
-        <hr>
-
-
-        <p
-            style="
-                text-align:center;
-                font-size:11px;
-            "
-        >
-
-            Thank You!
-
-            <br>
-
-            Visit Royal Store Again
-
-        </p>
-
-    `;
 
 }
 
